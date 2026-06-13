@@ -2,10 +2,25 @@ using UnityEngine;
 
 public class TextBasedAdventure : MonoBehaviour
 {
+    enum TileType
+    {
+        Invalid,
+        Empty,
+        Item,
+        Enemy,
+        Exit,
+    }
+
     string[,] tileNames = { { "Dark Cave",      "Mossy Tunnel",     "Crystal Room" },
                             { "Bone Chamber",   "Flooded Hall",     "Iron Gate"    },
                             { "Goblin Den",     "Armory",           "Throne Room"  }
                             };
+
+    TileType[,] tileTypes = {{ TileType.Empty, TileType.Item,  TileType.Empty},
+                             { TileType.Enemy, TileType.Empty, TileType.Exit},
+                             { TileType.Empty, TileType.Enemy, TileType.Item }
+                            };
+
     int playerRow = 0;
     int playerCol = 0;
 
@@ -20,11 +35,11 @@ public class TextBasedAdventure : MonoBehaviour
     {
         int newRow = playerRow;
         int newCol = playerCol;
-        if (Input.GetKeyDown(KeyCode.D))
+        if(Input.GetKeyDown(KeyCode.D))
         {
             newRow++;
         }
-        else if (Input.GetKeyDown(KeyCode.A))
+        else if(Input.GetKeyDown(KeyCode.A))
         {
             newRow--;
         }
@@ -51,6 +66,23 @@ public class TextBasedAdventure : MonoBehaviour
         }
         Debug.Log("You are in: " + tileNames[playerRow, playerCol]);
 
-
+        switch (tileTypes[playerRow, playerCol])
+        {
+            case TileType.Empty:
+                Debug.Log("There is nothing here.");
+                break;
+            case TileType.Enemy:
+                Debug.Log("Oooo a spooky ghost");
+                break;
+            case TileType.Item:
+                Debug.Log("You see a shiny object");
+                break;
+            case TileType.Exit:
+                Debug.Log("You see a way out");
+                break;
+            default:
+                Debug.LogError("Invalid TileType");
+                break;
+        }
     }
 }
