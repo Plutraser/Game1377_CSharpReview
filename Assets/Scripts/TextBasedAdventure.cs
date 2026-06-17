@@ -9,17 +9,42 @@ public class TextBasedAdventure : MonoBehaviour
         Item,
         Enemy,
         Exit,
+        Teleporter,
+        Blockade,
     }
 
-    private string[,] tileNames = { { "Dark Cave"   /* 0,0 */,  "Mossy Tunnel" /* 0,1 */,   "Crystal Room" /* 0,2 */ },
-                                    { "Bone Chamber"/* 1,0 */,  "Flooded Hall" /* 1,1 */,   "Iron Gate"              },
-                                    { "Goblin Den",             "Armory",                   "Throne Room"            }
+    private string[,] tileNames = { { "Dark Cave"              /* 0,0 */,  "Mossy Tunnel"         /* 0,1 */,   "Crystal Room"            /* 0,2 */,  "Dev Room"        /* 0,3 */},
+                                    { "(Blockade)"            /* 1,0 */,  "Flooded Hall"         /* 1,1 */,   "Iron Gate"               /* 1.2 */,  "Treasure Room"   /* 1,3 */},
+                                    { "Goblin Den",          /* 2.0 */   "Armory",              /* 2.1 */     "Throne Room"            /* 2.2 */,  "Furnace Kitchen" /* 2,3 */},
+                                    { "Bone Chamber",       /* 3.0 */   "Ritual Room",         /* 3.1 */     "(Blockade)"             /* 3.2 */,  "Laboratory"      /* 3,3 */}
                                     };
 
-    private TileType[,] tileTypes = {   { TileType.Empty, TileType.Item,  TileType.Empty},
-                                        { TileType.Enemy, TileType.Empty, TileType.Exit },
-                                        { TileType.Empty, TileType.Enemy, TileType.Item }
-                                    };
+    private TileType[,] tileTypes = { { TileType.Empty, TileType.Item,  TileType.Teleporter, TileType.Enemy},
+                                      { TileType.Blockade, TileType.Empty, TileType.Exit, TileType.Item},
+                                      { TileType.Enemy, TileType.Teleporter, TileType.Item, TileType.Empty},
+                                      { TileType.Enemy, TileType.Empty, TileType.Blockade, TileType.Item},
+                                      };
+
+    private string[,] tileDescriptions = { { "It's humid, you can hear a faint dripping of water far into the cave.", /* 0,0 */
+                                             "The floor is slippery with the moss, the tunnel appears endless.", /* 0,1 */
+                                             "Blinding false lights reflect into your eyes making it hard to view the beautiful room.", /* 0,2 */
+                                             "A room filled with easter eggs and funny images- a dev room is always needed in a game."}, /* 0,3 */
+
+                                           { "The path is blocked, turn around.", /* 1,0 */
+                                             "Your shoes are soaked with the mysterious liquid, a squelch is made with each step.", /* 1,1 */
+                                             "A light slips through the bars of the large iron gate, relief overcomes you.", /* 1,2 */
+                                             "A chest stands in the middle of the room on a pile of gold and other shimmering objects."},/* 1,3 */
+
+                                           { "It appears to be an abandoned den which seemed to house goblins back in its day.", /* 2,0 */
+                                             "You flinch instinctively seeing a body in front of you before realizing it's just an armorstand.", /* 2,1 */
+                                             "The room opens into an expansive throne room, a luxurious rug leading up to the throne forward.", /* 2,2 */
+                                             "A heavy heat washes over you with the omnious glow of the large furnace."},/* 2,3 */
+
+                                           { "Pale bones decorate the large chamber.", /* 3,0 */
+                                             "An omnious hum reverberates around you with the faint red glow from the candles surrounding a drawn symbol on the ground.", /* 3,1 */ 
+                                             "The path is blocked, turn around.", /* 3,2 */
+                                             "Wires are strewn from the ceiling, way too close to the open containers of chemicals. A broken flickering light makes it difficult to see."} /* 3,3 */
+                                           };
 
     private int playerRow = 0;
     private int playerCol = 0;
@@ -48,6 +73,7 @@ public class TextBasedAdventure : MonoBehaviour
     private void OutputTileInformation()
     {
         Debug.Log("You are in: " + tileNames[playerRow, playerCol]);
+        Debug.Log(tileDescriptions[playerRow, playerCol]);
 
         switch (tileTypes[playerRow, playerCol])
         {
@@ -64,6 +90,14 @@ public class TextBasedAdventure : MonoBehaviour
                 break;
             case TileType.Exit:
                 Debug.Log("You see a way out");
+                break;
+            case TileType.Teleporter:
+                Debug.Log("A warping sound is echoing.");
+                //Make teleporters work
+                break;
+            case TileType.Blockade:
+                Debug.Log("It's blocked off.");
+                //Place the player back into their spot, use the code that makes sure the player isnt out of bounds?
                 break;
             default:
                 Debug.LogError("Invalid TileType");
