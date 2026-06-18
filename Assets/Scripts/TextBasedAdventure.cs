@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using static UnityEngine.Rendering.DebugUI.Table;
 
 public class TextBasedAdventure : MonoBehaviour
 {
@@ -54,6 +55,7 @@ public class TextBasedAdventure : MonoBehaviour
     private int playerHealth = 10;
     private int enemyDamage = 1;
     private int itemHealAmount = 2;
+    private bool teleporterActive = false;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -76,7 +78,11 @@ public class TextBasedAdventure : MonoBehaviour
     private void OutputTileInformation()
     {
         Debug.Log("You are in: " + tileNames[playerRow, playerCol]);
-        if (!tilesVisited.Contains((playerRow, playerCol)))
+        if (!(playerRow == 0 && playerCol == 2) || !(playerRow == 2 && playerCol == 1)) //Checks if the player is currently on a teleporter tile
+        {
+            teleporterActive = false;
+        } 
+        if (!tilesVisited.Contains((playerRow, playerCol))) //Checking if the player has visited this tile, if not, the description is shown
         {
             Debug.Log(tileDescriptions[playerRow, playerCol]);
         }
@@ -100,18 +106,21 @@ public class TextBasedAdventure : MonoBehaviour
                 break;
             case TileType.Teleporter:
                 Debug.Log("A warping sound is echoing.");
-                //Make teleporters work
+                AtTeleporter(playerRow, playerCol);
                 break;
             case TileType.Blockade:
-                Debug.Log("It's blocked off.");
-                //Place the player back into their spot, use the code that makes sure the player isnt out of bounds?
+                Debug.Log("It's blocked off."); //Wont be seen because Player isnt allowed onto tile
                 break;
             default:
                 Debug.LogError("Invalid TileType");
                 break;
         }
     }
-
+    private void AtTeleporter(int Row, int Col)
+    {
+        teleporterActive = true;
+        Debug.Log("Press T to use teleporter.");
+    }
     private void EncounterEnemy()
     {
         PlayerTakeDamage(enemyDamage);
@@ -165,6 +174,10 @@ public class TextBasedAdventure : MonoBehaviour
     /// <returns>True if it is within the bounds, false if not</returns>
     private bool CheckIfNewPositionInTileBounds(int newRow, int newCol)
     {
+        if ((newRow == 1 && newCol == 0) || (newRow == 3 && newCol == 2)) //This checks tiles (1,0) and (3,2) These are the ones that are blocked.
+        {
+            return false;
+        }
         return (newRow >= 0 && newRow < tileNames.GetLength(0)) && (newCol >= 0 && newCol < tileNames.GetLength(1));
     }
 
@@ -176,7 +189,8 @@ public class TextBasedAdventure : MonoBehaviour
     /// <returns>True if an input was pressed, false if not</returns>
     private bool HandleInput(out int newRow, out int newCol)
     {
-        bool hasPressedKey = true;
+        bool hasMoved = true;
+
         newRow = playerRow;
         newCol = playerCol;
 
@@ -204,13 +218,26 @@ public class TextBasedAdventure : MonoBehaviour
         {
             Debug.Log("You look around.");
             Debug.Log(tileDescriptions[playerRow, playerCol]);
-            hasPressedKey = false; //This is because this bool is to check if the player has moved- the player does not move but just looks
+            hasMoved = false; //This is because this bool is to check if the player has moved- the player does not move but just looks
+        }
+        else if (Input.GetKeyDown(KeyCode.T) && teleporterActive == true)
+        {
+            if (newRow == 0 && newCol == 2) //Teleports player to other teleporter
+            {
+                newRow = 2;
+                newCol = 1;
+            }
+            else if (newRow == 2 && newCol == 1) //Teleports player to other teleporter
+            {
+                newRow = 0;
+                newCol = 2;
+            }
         }
         else
         {
-            hasPressedKey = false;
+            hasMoved = false;
         }
-        return hasPressedKey;
+        return hasMoved;
     }
 
 }
