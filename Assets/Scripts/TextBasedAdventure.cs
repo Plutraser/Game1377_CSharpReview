@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class TextBasedAdventure : MonoBehaviour
@@ -12,6 +13,8 @@ public class TextBasedAdventure : MonoBehaviour
         Teleporter,
         Blockade,
     }
+
+    private List<(int Row, int Col)> tilesVisited = new List<(int Row, int Col)>(); 
 
     private string[,] tileNames = { { "Dark Cave"              /* 0,0 */,  "Mossy Tunnel"         /* 0,1 */,   "Crystal Room"            /* 0,2 */,  "Dev Room"        /* 0,3 */},
                                     { "(Blockade)"            /* 1,0 */,  "Flooded Hall"         /* 1,1 */,   "Iron Gate"               /* 1.2 */,  "Treasure Room"   /* 1,3 */},
@@ -73,7 +76,11 @@ public class TextBasedAdventure : MonoBehaviour
     private void OutputTileInformation()
     {
         Debug.Log("You are in: " + tileNames[playerRow, playerCol]);
-        Debug.Log(tileDescriptions[playerRow, playerCol]);
+        if (!tilesVisited.Contains((playerRow, playerCol)))
+        {
+            Debug.Log(tileDescriptions[playerRow, playerCol]);
+        }
+        tilesVisited.Add((playerRow, playerCol)); //Putting the addition of the list here so the player gets the description first THEN it counts as being visited
 
         switch (tileTypes[playerRow, playerCol])
         {
@@ -172,7 +179,7 @@ public class TextBasedAdventure : MonoBehaviour
         bool hasPressedKey = true;
         newRow = playerRow;
         newCol = playerCol;
-        
+
         if (Input.GetKeyDown(KeyCode.D))
         {
             Debug.Log("You pressed " + KeyCode.D);
@@ -192,6 +199,12 @@ public class TextBasedAdventure : MonoBehaviour
         {
             Debug.Log("You pressed " + KeyCode.S);
             newRow++;
+        }
+        else if (Input.GetKeyDown(KeyCode.Space))
+        {
+            Debug.Log("You look around.");
+            Debug.Log(tileDescriptions[playerRow, playerCol]);
+            hasPressedKey = false; //This is because this bool is to check if the player has moved- the player does not move but just looks
         }
         else
         {
