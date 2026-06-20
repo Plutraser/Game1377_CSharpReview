@@ -78,10 +78,6 @@ public class TextBasedAdventure : MonoBehaviour
     private void OutputTileInformation()
     {
         Debug.Log("You are in: " + tileNames[playerRow, playerCol]);
-        if (!(playerRow == 0 && playerCol == 2) || !(playerRow == 2 && playerCol == 1)) //Checks if the player is currently on a teleporter tile
-        {
-            teleporterActive = false;
-        } 
         if (!tilesVisited.Contains((playerRow, playerCol))) //Checking if the player has visited this tile, if not, the description is shown
         {
             Debug.Log(tileDescriptions[playerRow, playerCol]);
@@ -91,17 +87,21 @@ public class TextBasedAdventure : MonoBehaviour
         switch (tileTypes[playerRow, playerCol])
         {
             case TileType.Empty:
+                teleporterActive = false;
                 Debug.Log("There is nothing here.");
                 break;
             case TileType.Enemy:
+                teleporterActive = false;
                 Debug.Log("Oooo a spooky ghost");
                 EncounterEnemy();
                 break;
             case TileType.Item:
+                teleporterActive = false;
                 Debug.Log("You see a shiny object");
                 ItemPickup();
                 break;
             case TileType.Exit:
+                teleporterActive = false;
                 Debug.Log("You see a way out");
                 break;
             case TileType.Teleporter:
@@ -109,6 +109,7 @@ public class TextBasedAdventure : MonoBehaviour
                 AtTeleporter(playerRow, playerCol);
                 break;
             case TileType.Blockade:
+                //Doesnt need the bool because player cant be on it
                 Debug.Log("It's blocked off."); //Wont be seen because Player isnt allowed onto tile
                 break;
             default:
